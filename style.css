@@ -8,7 +8,8 @@
 
 body{
     font-family: "Poppins", sans-serif;
-    background-image: url(images/BMW-SOC27-X5-EXPANDED_16to7.webp);
+    height: 800px;
+    background-image: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.13)), url(images/BMW-SOC27-X5-EXPANDED_16to7.webp);
     background-position: center;
     background-size: cover;
     background-repeat: no-repeat;
@@ -16,8 +17,8 @@ body{
 
 .header {
   overflow: hidden;
-  background-color: #ffffff25;
-  padding: 10px 10px;
+  background-color: transparent;
+  padding: 10px 100px;
   justify-content: space-between;
   align-items: center;
   display: flex;
@@ -62,6 +63,12 @@ body{
     padding: 10px;
 }
 
+.line{
+    background-color: white;
+    height: 2.5px;
+    width: 1600px;
+    margin-left: 110px;
+}
 
 @media screen and (max-width: 500px) {
   .header a {
