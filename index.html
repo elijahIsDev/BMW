@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="light-content" />
+  <title>SoFi - Login</title>
+  <style>
+    /* RESET & CORE STYLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      background-color: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    :root {
+      --sofi-cyan: #00A9BE;
+      --sofi-btn-teal: #007D8C;
+      --text-dark: #1E293B;
+      --text-muted: #64748B;
+      --border-gray: #E2E8F0;
+    }
+
+    /* APP FRAME CONTAINER */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      height: 100dvh;
+      background: var(--sofi-cyan);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 440px) {
+      .app-container {
+        height: 880px;
+        border-radius: 40px;
+        border: 8px solid #1C2433;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      }
+    }
+
+    /* TOP BOOT PROGRESS BAR */
+    .boot-progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.9);
+      width: 0%;
+      z-index: 10;
+      transition: width 5s linear;
+    }
+
+    /* SCREEN VIEWS & TRANSITIONS */
+    .screen-view {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s ease;
+      z-index: 1;
+    }
+
+    .screen-view.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 2;
+    }
+
+    /* 1. WELCOME / SPLASH SCREEN */
+    #splash-screen {
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .splash-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      animation: logoAppear 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .splash-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .splash-wordmark {
+      font-size: 58px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    .splash-subtitle {
+      font-size: 34px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.5px;
+      margin-top: 2px;
+      line-height: 1.1;
+    }
+
+    /* 2. LOGIN FORM SCREEN */
+    #login-screen {
+      justify-content: space-between;
+      overflow-y: auto;
+      padding: 24px 16px 12px 16px;
+    }
+
+    .top-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      margin-bottom: 24px;
+    }
+
+    .brand-wordmark {
+      font-size: 42px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -1.5px;
+      line-height: 1;
+    }
+
+    .login-card {
+      width: 100%;
+      background: #FFFFFF;
+      border-radius: 28px;
+      padding: 32px 24px 28px 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .form-group {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .input-field {
+      width: 100%;
+      height: 56px;
+      border: 1px solid var(--border-gray);
+      border-radius: 16px;
+      padding: 0 18px;
+      font-size: 15px;
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-field::placeholder {
+      color: #94A3B8;
+    }
+
+    .input-field:focus {
+      border-color: var(--sofi-cyan);
+      box-shadow: 0 0 0 3px rgba(0, 169, 190, 0.15);
+    }
+
+    .forgot-link {
+      align-self: flex-start;
+      color: var(--sofi-cyan);
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 4px;
+      margin-bottom: 24px;
+      cursor: pointer;
+    }
+
+    /* BUTTONS & SPINNER */
+    .btn-login {
+      width: 100%;
+      height: 52px;
+      background: var(--sofi-btn-teal);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 26px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-login:active {
+      opacity: 0.9;
+      transform: scale(0.99);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #FFFFFF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .btn-passkey {
+      width: 100%;
+      height: 52px;
+      background: transparent;
+      color: var(--sofi-btn-teal);
+      border: 1.5px solid var(--sofi-btn-teal);
+      border-radius: 26px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-passkey:active {
+      background: rgba(0, 125, 140, 0.05);
+      transform: scale(0.99);
+    }
+
+    .footer-section {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .signup-text {
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      cursor: pointer;
+    }
+
+    .shield-badge {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      backdrop-filter: blur(4px);
+    }
+
+    .legal-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .legal-links a {
+      color: #FFFFFF;
+      text-decoration: none;
+    }
+
+    @keyframes logoAppear {
+      0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="boot-progress-bar" id="bootProgress"></div>
+
+    <!-- VIEW 1: WELCOME / SPLASH SCREEN -->
+    <section id="splash-screen" class="screen-view active" onclick="goToLogin()">
+      <div class="splash-content">
+        <div class="splash-logo-row">
+          <span class="splash-wordmark">SoFi</span>
+          <svg width="44" height="44" viewBox="0 0 96 96" fill="none">
+            <circle cx="16" cy="16" r="16" fill="white"/>
+            <circle cx="48" cy="16" r="16" fill="white"/>
+            <circle cx="80" cy="16" r="13.5" stroke="white" stroke-width="5"/>
+            <circle cx="16" cy="48" r="16" fill="white"/>
+            <circle cx="48" cy="48" r="13.5" stroke="white" stroke-width="5"/>
+            <circle cx="80" cy="48" r="16" fill="white"/>
+            <circle cx="16" cy="80" r="13.5" stroke="white" stroke-width="5"/>
+            <circle cx="48" cy="80" r="16" fill="white"/>
+            <circle cx="80" cy="80" r="16" fill="white"/>
+          </svg>
+        </div>
+        <div class="splash-subtitle">Hong Kong</div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: LOGIN FORM SCREEN -->
+    <section id="login-screen" class="screen-view">
+      <div class="top-header">
+        <span class="brand-wordmark">SoFi</span>
+        <svg width="32" height="32" viewBox="0 0 96 96" fill="none">
+          <circle cx="16" cy="16" r="16" fill="white"/>
+          <circle cx="48" cy="16" r="16" fill="white"/>
+          <circle cx="80" cy="16" r="13.5" stroke="white" stroke-width="5"/>
+          <circle cx="16" cy="48" r="16" fill="white"/>
+          <circle cx="48" cy="48" r="13.5" stroke="white" stroke-width="5"/>
+          <circle cx="80" cy="48" r="16" fill="white"/>
+          <circle cx="16" cy="80" r="13.5" stroke="white" stroke-width="5"/>
+          <circle cx="48" cy="80" r="16" fill="white"/>
+          <circle cx="80" cy="80" r="16" fill="white"/>
+        </svg>
+      </div>
+
+      <div class="login-card">
+        <h1 class="card-title">Secure login</h1>
+        <p class="card-subtitle">Log in to Get Your Money Right®</p>
+
+        <form style="width: 100%; display: flex; flex-direction: column; align-items: center;" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <input type="email" id="email-input" class="input-field" placeholder="Email" value="user@sofi.com" required />
+          </div>
+
+          <div class="form-group">
+            <input type="password" id="password-input" class="input-field" placeholder="Password" value="••••••••" required />
+          </div>
+
+          <a class="forgot-link">Forgot password?</a>
+
+          <button type="submit" class="btn-login" id="loginBtn">
+            <span id="btnText">Log in</span>
+            <span class="spinner" id="btnSpinner"></span>
+          </button>
+          <button type="button" class="btn-passkey">Log in with passkey</button>
+        </form>
+      </div>
+
+      <div class="footer-section">
+        <div class="signup-text">New to SoFi? Sign up</div>
+
+        <div class="shield-badge">
+          <svg width="22" height="22" viewBox="0 0 96 96" fill="none">
+            <circle cx="16" cy="16" r="14" fill="white"/>
+            <circle cx="48" cy="16" r="14" fill="white"/>
+            <circle cx="80" cy="16" r="12" stroke="white" stroke-width="4"/>
+            <circle cx="16" cy="48" r="14" fill="white"/>
+            <circle cx="48" cy="48" r="12" stroke="white" stroke-width="4"/>
+            <circle cx="80" cy="48" r="14" fill="white"/>
+            <circle cx="16" cy="80" r="12" stroke="white" stroke-width="4"/>
+            <circle cx="48" cy="80" r="14" fill="white"/>
+            <circle cx="80" cy="80" r="14" fill="white"/>
+          </svg>
+        </div>
+
+        <div class="legal-links">
+          <a href="#">Help</a>
+          <span>•</span>
+          <a href="#">Terms of Service</a>
+          <span>•</span>
+          <a href="#">Privacy Policy</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    let transitionTimer;
+
+    function goToLogin() {
+      if (transitionTimer) clearTimeout(transitionTimer);
+
+      const splash = document.getElementById('splash-screen');
+      const login = document.getElementById('login-screen');
+      const progressBar = document.getElementById('bootProgress');
+
+      progressBar.style.display = 'none';
+      splash.classList.remove('active');
+      login.classList.add('active');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const progressBar = document.getElementById('bootProgress');
+      setTimeout(() => {
+        progressBar.style.width = '100%';
+      }, 50);
+
+      transitionTimer = setTimeout(() => {
+        goToLogin();
+      }, 5000);
+    });
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const loginBtn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('btnText');
+      const btnSpinner = document.getElementById('btnSpinner');
+
+      loginBtn.disabled = true;
+      btnText.innerText = "Authenticating...";
+      btnSpinner.style.display = "inline-block";
+
+      setTimeout(() => {
+        window.location.href = "Home.html";
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
