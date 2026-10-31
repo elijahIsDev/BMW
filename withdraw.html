@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="light-content" />
+  <title>SoFi - Withdraw USD</title>
+  <style>
+    /* RESET & CORE STYLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      background-color: #F8FAFC;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+    }
+
+    :root {
+      --sofi-cyan: #00A9BE;
+      --text-dark: #0F172A;
+      --text-muted: #64748B;
+      --border-gray: #E2E8F0;
+      --card-bg: #FFFFFF;
+      --green-up: #16A34A;
+    }
+
+    /* APP CONTAINER (PC WIDESCREEN & MOBILE ADAPTIVE) */
+    .app-container {
+      width: 100%;
+      max-width: 1200px;
+      min-height: 100vh;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    /* HEADER BAR */
+    .screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #F1F5F9;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .back-nav-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F172A;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .header-title-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    /* MAIN CONTENT SCROLL AREA */
+    .withdraw-content {
+      flex: 1;
+      padding: 24px;
+      max-width: 720px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* BALANCE CARD HEADER */
+    .balance-banner {
+      background: #F8FAFC;
+      border: 1px solid var(--border-gray);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .banner-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .banner-amount {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-top: 2px;
+      letter-spacing: -0.5px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .recommended-badge {
+      background: #DCFCE7;
+      color: #15803D;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 12px;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    /* METHOD CARDS GRID */
+    .methods-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .method-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-gray);
+      border-radius: 20px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .method-card:hover {
+      border-color: var(--sofi-cyan);
+      box-shadow: 0 4px 16px rgba(0, 169, 190, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .method-card.featured {
+      border-color: #00A9BE;
+      background: #FAFEFF;
+    }
+
+    .method-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .method-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .method-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .method-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .method-speed {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .speed-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-up);
+      background: #F0FDF4;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
+
+    /* MODAL OVERLAY FOR ACCOUNT DETAILS */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .action-sheet-content {
+      width: 100%;
+      max-width: 600px;
+      background: #FFFFFF;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 20px 24px 36px 24px;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-overlay.open .action-sheet-content {
+      transform: translateY(0);
+    }
+
+    .sheet-drag-handle {
+      width: 40px;
+      height: 4px;
+      background: #CBD5E1;
+      border-radius: 2px;
+      align-self: center;
+      margin-bottom: 20px;
+    }
+
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-dark);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .form-input {
+      width: 100%;
+      height: 52px;
+      border: 1px solid var(--border-gray);
+      border-radius: 14px;
+      padding: 0 16px;
+      font-size: 15px;
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--sofi-cyan);
+    }
+
+    .btn-submit-withdraw {
+      width: 100%;
+      height: 52px;
+      background: var(--sofi-cyan);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 26px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .btn-submit-withdraw:active {
+      opacity: 0.9;
+      transform: scale(0.99);
+    }
+
+    /* 3.5-SECOND LOADER SCREEN OVERLAY */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.95);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease;
+    }
+
+    .loader-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .spinner-ring {
+      width: 56px;
+      height: 56px;
+      border: 4px solid rgba(0, 169, 190, 0.2);
+      border-top-color: var(--sofi-cyan);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loader-text {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* MOBILE RESPONSIVE MEDIA QUERIES (< 768px) */
+    @media (max-width: 767px) {
+      body { background-color: #FFFFFF; }
+      .app-container { box-shadow: none; }
+      .withdraw-content { padding: 16px; }
+      .action-sheet-content {
+        max-width: 100%;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- HEADER BAR -->
+    <header class="screen-header">
+      <a href="Transfer.html" class="back-nav-btn" title="Back to Transfer">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+      <span class="header-title-text">Withdraw as USD</span>
+      <div style="width: 36px;"></div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="withdraw-content">
+
+      <!-- BALANCE HERO BANNER -->
+      <div class="balance-banner">
+        <div>
+          <div class="banner-label">Available for Withdrawal</div>
+          <div class="banner-amount">$11,906.48</div>
+        </div>
+        <div style="font-size: 12px; font-weight: 700; color: #00A9BE; text-align: right;">
+          <div>Fee: $0.00</div>
+          <div style="color: #64748B; font-weight: 500; margin-top: 2px;">Instant Processing</div>
+        </div>
+      </div>
+
+      <!-- HIGHLY RECOMMENDED METHODS -->
+      <div class="section-title">
+        Recommended Apps <span class="recommended-badge">Fast & Easy</span>
+      </div>
+
+      <div class="methods-grid">
+        
+        <!-- PayPal -->
+        <div class="method-card featured" onclick="openModal('PayPal', 'Email or Phone Number', 'user@paypal.com')">
+          <div class="method-left">
+            <div class="method-icon" style="background: #003087; color: #FFFFFF;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944 3.72a.762.762 0 0 1 .752-.643h6.812c2.518 0 4.502.583 5.485 1.62 1.002 1.057 1.137 2.656.402 4.757-.84 2.4-2.735 4.022-5.183 4.492-1.02.196-2.188.236-3.414.236H7.954a.64.64 0 0 0-.632.538l-.246 1.56-.002.013a.64.64 0 0 0 .002.013l-.001.011zm1.756-11.12h1.668c2.25 0 3.844-.45 4.38-1.983.473-1.35.15-2.268-.962-2.825-.662-.332-1.74-.473-3.047-.473H8.38l-1.603 9.774 1.282-2.831a1.28 1.28 0 0 1 .773-1.662z"/></svg>
+            </div>
+            <div class="method-info">
+              <div class="method-name">PayPal</div>
+              <div class="method-speed">Instant Transfer • Email / Phone</div>
+            </div>
+          </div>
+          <div class="speed-tag">Instant</div>
+        </div>
+
+        <!-- Cash App -->
+        <div class="method-card featured" onclick="openModal('Cash App', '$Cashtag', '$YourTag')">
+          <div class="method-left">
+            <div class="method-icon" style="background: #00D632; color: #FFFFFF;">
+              $
+            </div>
+            <div class="method-info">
+              <div class="method-name">Cash App</div>
+              <div class="method-speed">Instant Transfer • $Cashtag</div>
+            </div>
+          </div>
+          <div class="speed-tag">Instant</div>
+        </div>
+
+        <!-- Venmo -->
+        <div class="method-card featured" onclick="openModal('Venmo', 'Venmo Username', '@username')">
+          <div class="method-left">
+            <div class="method-icon" style="background: #008CFF; color: #FFFFFF;">
+              v
+            </div>
+            <div class="method-info">
+              <div class="method-name">Venmo</div>
+              <div class="method-speed">Instant Transfer • @Username</div>
+            </div>
+          </div>
+          <div class="speed-tag">Instant</div>
+        </div>
+
+      </div>
+
+      <!-- OTHER BANK & PAYMENT OPTIONS -->
+      <div class="section-title">Other Withdrawal Methods</div>
+
+      <div class="methods-grid">
+
+        <!-- Zelle -->
+        <div class="method-card" onclick="openModal('Zelle', 'Mobile Number or Email', 'name@domain.com')">
+          <div class="method-left">
+            <div class="method-icon" style="background: #7414CA; color: #FFFFFF;">
+              z
+            </div>
+            <div class="method-info">
+              <div class="method-name">Zelle</div>
+              <div class="method-speed">Direct to US Bank account</div>
+            </div>
+          </div>
+          <div class="method-speed" style="color: #64748B;">Same day</div>
+        </div>
+
+        <!-- Revolut -->
+        <div class="method-card" onclick="openModal('Revolut', 'Revtag / Phone', '@revtag')">
+          <div class="method-left">
+            <div class="method-icon" style="background: #000000; color: #FFFFFF;">
+              R
+            </div>
+            <div class="method-info">
+              <div class="method-name">Revolut</div>
+              <div class="method-speed">Global multi-currency transfer</div>
+            </div>
+          </div>
+          <div class="method-speed" style="color: #64748B;">1-2 hrs</div>
+        </div>
+
+        <!-- Direct Bank ACH -->
+        <div class="method-card" onclick="openModal('Direct ACH Bank Transfer', 'Account Number / Routing', '021000021')">
+          <div class="method-left">
+            <div class="method-icon" style="background: #F1F5F9; color: #0F172A;">
+              🏛️
+            </div>
+            <div class="method-info">
+              <div class="method-name">Direct ACH Bank Transfer</div>
+              <div class="method-speed">Standard US Bank account</div>
+            </div>
+          </div>
+          <div class="method-speed" style="color: #64748B;">1-3 days</div>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- WITHDRAWAL FORM MODAL -->
+    <div class="modal-overlay" id="withdrawModal" onclick="closeModalOnBackdrop(event)">
+      <div class="action-sheet-content">
+        <div class="sheet-drag-handle"></div>
+        <div class="sheet-title" id="modalTitle">Withdraw Funds</div>
+
+        <form onsubmit="handleWithdrawalSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">Amount (USD)</label>
+            <input type="number" class="form-input" id="withdrawAmount" placeholder="0.00" min="1" max="78906.48" step="0.01" required />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" id="fieldLabel">Account Identifier</label>
+            <input type="text" class="form-input" id="fieldInput" placeholder="Enter details" required />
+          </div>
+
+          <button type="submit" class="btn-submit-withdraw">Confirm Withdrawal</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 3.5 SECOND LOADER OVERLAY -->
+    <div class="loader-overlay" id="loaderOverlay">
+      <div class="spinner-ring"></div>
+      <div class="loader-text">Processing withdrawal securely...</div>
+    </div>
+
+  </div>
+
+  <script>
+    let activeMethod = '';
+
+    function openModal(methodName, labelText, placeholderText) {
+      activeMethod = methodName;
+      document.getElementById('modalTitle').innerText = 'Withdraw via ' + methodName;
+      document.getElementById('fieldLabel').innerText = labelText;
+      document.getElementById('fieldInput').placeholder = placeholderText;
+      document.getElementById('withdrawModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('withdrawModal').classList.remove('open');
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'withdrawModal') {
+        closeModal();
+      }
+    }
+
+    function handleWithdrawalSubmit(e) {
+      e.preventDefault();
+      const amount = document.getElementById('withdrawAmount').value;
+      const account = document.getElementById('fieldInput').value;
+      
+      // Close modal sheet
+      closeModal();
+
+      // Show the 3.5-second loader screen overlay
+      document.getElementById('loaderOverlay').classList.add('active');
+
+      // Wait 3.5 seconds, then transition to success screen with parameters
+      setTimeout(() => {
+        window.location.href = "WithdrawSuccess.html?method=" + encodeURIComponent(activeMethod) + "&amount=" + encodeURIComponent(amount) + "&account=" + encodeURIComponent(account);
+      }, 3500);
+    }
+  </script>
+
+</body>
+</html>

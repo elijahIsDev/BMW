@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="light-content" />
+  <title>SoFi - Transfer Crypto</title>
+  <style>
+    /* RESET & CORE STYLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      background-color: #F8FAFC;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+    }
+
+    :root {
+      --sofi-cyan: #00A9BE;
+      --text-dark: #0F172A;
+      --text-muted: #64748B;
+      --green-up: #16A34A;
+      --border-gray: #F1F5F9;
+      --card-bg-subtle: #F8FAFC;
+    }
+
+    /* APP CONTAINER (PC WIDESCREEN & MOBILE ADAPTIVE) */
+    .app-container {
+      width: 100%;
+      max-width: 1200px;
+      min-height: 100vh;
+      background: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+    }
+
+    /* HEADER BAR */
+    .screen-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: #FFFFFF;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .back-nav-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F172A;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .header-title-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: #0F172A;
+    }
+
+    .icon-action-btn {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* MAIN SCROLLABLE CONTENT */
+    .crypto-content {
+      flex: 1;
+      padding: 12px 24px 100px 24px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* TOTAL VALUE HERO SECTION */
+    .value-hero-section {
+      margin-bottom: 24px;
+    }
+
+    .total-val-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .total-val-amount {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -1.2px;
+      display: flex;
+      align-items: flex-start;
+      line-height: 1;
+    }
+
+    .total-val-cents {
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+
+    .today-change-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green-up);
+      margin-top: 10px;
+      width: fit-content;
+      animation: greenLivePulse 2.5s ease-in-out infinite alternate;
+    }
+
+    .metric-value-green {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--green-up);
+      animation: greenLivePulse 2.5s ease-in-out infinite alternate;
+      display: inline-block;
+    }
+
+    .asset-change-pct {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green-up);
+      margin-top: 2px;
+      animation: greenLivePulse 2.5s ease-in-out infinite alternate;
+      display: inline-block;
+    }
+
+    @keyframes greenLivePulse {
+      0% { opacity: 0.7; transform: scale(0.98); }
+      50% { opacity: 1; transform: scale(1.02); }
+      100% { opacity: 0.7; transform: scale(0.98); }
+    }
+
+    /* TOTAL RETURN METRICS CARD */
+    .metrics-summary-card {
+      background: var(--card-bg-subtle);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .info-circle-icon {
+      color: #94A3B8;
+    }
+
+    .metric-value-dark {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    /* ASSETS SECTION HEADER */
+    .assets-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .assets-section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .sort-filter-btn {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    /* ASSETS LIST */
+    .assets-container-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .asset-group-pill {
+      background: #F1F5F9;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #475569;
+    }
+
+    .asset-item-card {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border-gray);
+      padding: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .asset-item-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .asset-token-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .asset-title-text {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .asset-sub-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .asset-item-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: right;
+    }
+
+    .asset-main-price {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-dark);
+    }
+
+    .dropdown-chevron {
+      color: #94A3B8;
+    }
+
+    /* BOTTOM ACTION BUTTONS BAR */
+    .action-bottom-dock {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 1200px;
+      background: #FFFFFF;
+      border-top: 1px solid #F1F5F9;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 30;
+    }
+
+    .action-tab-pill {
+      flex: 1;
+      height: 48px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid var(--border-gray);
+      color: var(--text-dark);
+      background: #FFFFFF;
+    }
+
+    .action-tab-pill.active {
+      background: var(--sofi-cyan);
+      color: #FFFFFF;
+      border: none;
+    }
+
+    /* TRANSFER ACTION SHEET MODAL OVERLAY */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .action-sheet-content {
+      width: 100%;
+      max-width: 600px;
+      background: #FFFFFF;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 16px 24px 40px 24px;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .modal-overlay.open .action-sheet-content {
+      transform: translateY(0);
+    }
+
+    .sheet-drag-handle {
+      width: 40px;
+      height: 4px;
+      background: #CBD5E1;
+      border-radius: 2px;
+      align-self: center;
+      margin-bottom: 20px;
+    }
+
+    .sheet-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-dark);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .sheet-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .sheet-option-card {
+      background: #F8FAFC;
+      text-decoration: none;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+
+    .sheet-option-card:hover {
+      background: #F1F5F9;
+      border-color: #CBD5E1;
+    }
+
+    .sheet-option-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-dark);
+      flex-shrink: 0;
+    }
+
+    .sheet-option-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sheet-option-info span{
+        text-decoration: none;
+    }
+
+    .sheet-option-name {
+      
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .sheet-option-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    .sheet-option-card.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* MOBILE RESPONSIVE MEDIA QUERIES (< 768px) */
+    @media (max-width: 767px) {
+      body {
+        background-color: #FFFFFF;
+      }
+
+      .app-container {
+        box-shadow: none;
+      }
+
+      .crypto-content {
+        padding: 12px 16px 100px 16px;
+      }
+
+      .total-val-amount {
+        font-size: 38px;
+      }
+
+      .action-bottom-dock {
+        padding: 12px 16px;
+      }
+
+      .action-sheet-content {
+        max-width: 100%;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- TOP NAVIGATION HEADER -->
+    <header class="screen-header">
+      <a href="Banking.html" class="back-nav-btn" title="Back to Banking">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </a>
+
+      <span class="header-title-text">Crypto</span>
+
+      <div class="header-actions">
+        <div class="icon-action-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+        <div class="icon-action-btn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CRYPTO SCROLL CONTENT -->
+    <main class="crypto-content">
+
+      <!-- TOTAL VALUE DISPLAY -->
+      <section class="value-hero-section">
+        <div class="total-val-label">Total value</div>
+        <div class="total-val-amount">
+          $11,906<span class="total-val-cents">.48</span>
+        </div>
+        <div class="today-change-badge">
+          <span>↑ $1,737.22</span>
+          <span>|</span>
+          <span>1.39% today</span>
+        </div>
+      </section>
+
+      <!-- METRICS RETURN SUMMARY CARD -->
+      <section class="metrics-summary-card">
+        <div class="metric-row">
+          <span class="metric-label">Total return</span>
+          <span class="metric-value-green">↑ $18,834.17 &nbsp;|&nbsp; 31.47%</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-label">
+            Contributions
+            <svg class="info-circle-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          </span>
+          <span class="metric-value-dark">$10,072.30</span>
+        </div>
+      </section>
+
+      <!-- ASSETS SECTION -->
+      <section>
+        <div class="assets-section-header">
+          <h2 class="assets-section-title">Assets</h2>
+          <div class="sort-filter-btn">
+            Total value ($) ↑
+          </div>
+        </div>
+
+        <div class="assets-container-list">
+          
+          <!-- GROUP 1: STABLECOINS -->
+          <div class="asset-group-pill">
+            Stablecoins: $2,500.00
+          </div>
+
+          <!-- SOFID -->
+          <div class="asset-item-card">
+            <div class="asset-item-left">
+              <div class="asset-token-icon" style="background: #E0F2FE; border: 1px solid #BAE6FD;">
+                <!-- SoFi Dot Grid Logo -->
+                <svg width="22" height="22" viewBox="0 0 96 96" fill="none">
+                  <circle cx="16" cy="16" r="14" fill="#00A9BE"/>
+                  <circle cx="48" cy="16" r="14" fill="#00A9BE"/>
+                  <circle cx="80" cy="16" r="12" stroke="#00A9BE" stroke-width="4"/>
+                  <circle cx="16" cy="48" r="14" fill="#00A9BE"/>
+                  <circle cx="48" cy="48" r="12" stroke="#00A9BE" stroke-width="4"/>
+                  <circle cx="80" cy="48" r="14" fill="#00A9BE"/>
+                  <circle cx="16" cy="80" r="12" stroke="#00A9BE" stroke-width="4"/>
+                  <circle cx="48" cy="80" r="14" fill="#00A9BE"/>
+                  <circle cx="80" cy="80" r="14" fill="#00A9BE"/>
+                </svg>
+              </div>
+              <div>
+                <div class="asset-title-text">SOFID</div>
+                <div class="asset-sub-val">$2,000.00</div>
+              </div>
+            </div>
+            <div class="asset-item-right">
+              <svg class="dropdown-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+
+          <!-- USDC -->
+          <div class="asset-item-card">
+            <div class="asset-item-left">
+              <div class="asset-token-icon" style="background: #2775CA; color: #FFFFFF;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v12M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1.1-3 2.5 1.3 2.5 3 2.5 3 1.1 3 2.5-1.3 2.5-3 2.5-3-1.1-3-2.5"></path></svg>
+              </div>
+              <div>
+                <div class="asset-title-text">USDC</div>
+                <div class="asset-sub-val">$500.00</div>
+              </div>
+            </div>
+            <div class="asset-item-right">
+              <svg class="dropdown-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+
+          <!-- GROUP 2: CRYPTO -->
+          <div class="asset-group-pill" style="margin-top: 12px;">
+            Crypto: $11,906.48
+          </div>
+
+          <!-- BITCOIN (BTC) -->
+          <div class="asset-item-card">
+            <div class="asset-item-left">
+              <div class="asset-token-icon" style="background: #F7931A; color: #FFFFFF; font-weight: 900; font-size: 18px;">
+                ₿
+              </div>
+              <div>
+                <div class="asset-title-text">BTC</div>
+                <div class="asset-sub-val">$63,642.01</div>
+              </div>
+            </div>
+
+            <!-- SPARKLINE CHART GRAPHIC -->
+            <svg width="54" height="24" viewBox="0 0 54 24" fill="none" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 18L12 14L22 19L32 9L42 12L52 4"></path>
+            </svg>
+
+            <div class="asset-item-right">
+              <div>
+                <div class="asset-main-price">$109,727.60</div>
+                <div class="asset-change-pct">↑ 1.59%</div>
+              </div>
+              <svg class="dropdown-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- BOTTOM ACTION DOCK -->
+    <div class="action-bottom-dock">
+      <!-- Clicking this triggers the Transfer Crypto Modal Sheet -->
+      <div class="action-tab-pill active" onclick="openTransferModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 16V4M7 4L3 8M7 4l4 4M17 8v12M17 20l4-4M17 20l-4-4"></path></svg>
+        <span>Transfer</span>
+      </div>
+
+      <div class="action-tab-pill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"></circle><path d="M8 12h8"></path></svg>
+        <span>Sell</span>
+      </div>
+
+      <div class="action-tab-pill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8M8 12h8"></path></svg>
+        <span>Buy</span>
+      </div>
+    </div>
+
+    <!-- TRANSFER CRYPTO ACTION SHEET MODAL -->
+    <div class="modal-overlay" id="transferModal" onclick="closeTransferModalOnBackdrop(event)">
+      <div class="action-sheet-content">
+        <div class="sheet-drag-handle"></div>
+        <div class="sheet-title">Transfer crypto</div>
+
+        <div class="sheet-options-list">
+          
+          <!-- Send (Coming Soon) -->
+          <div class="sheet-option-card disabled">
+            <div class="sheet-option-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </div>
+            <div class="sheet-option-info">
+              <span class="sheet-option-name">Send</span>
+              <span class="sheet-option-sub">Coming soon</span>
+            </div>
+          </div>
+
+          <!-- Receive -->
+          <div class="sheet-option-card" onclick="alert('Receive Crypto flow initiated')">
+            <div class="sheet-option-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            </div>
+            <div class="sheet-option-info">
+              <span class="sheet-option-name">Receive</span>
+            </div>
+          </div>
+
+          <!-- Withdraw as USD -->
+          <a href="Withdraw.html" class="sheet-option-card">
+            <div class="sheet-option-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
+            <div class="sheet-option-info">
+              <span class="sheet-option-name">Withdraw as USD</span>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function openTransferModal() {
+      document.getElementById('transferModal').classList.add('open');
+    }
+
+    function closeTransferModal() {
+      document.getElementById('transferModal').classList.remove('open');
+    }
+
+    function closeTransferModalOnBackdrop(e) {
+      if (e.target.id === 'transferModal') {
+        closeTransferModal();
+      }
+    }
+  </script>
+
+</body>
+</html>
